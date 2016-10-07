@@ -66,10 +66,12 @@ func newDBServer() *server {
 
 // attempt key/value lookup into db
 func (s *server) Read(ctx context.Context, in *pb.RecordKey) (*pb.RecordValue, error) {
+	// get exclusive lock on server, deferring close
 	s.mu.Lock()
-	v := s.db[in.Key]
-	s.mu.Unlock()
-	return &pb.RecordValue{Value: v}, nil
+	defer s.mu.Unlock()
+
+	// lookup key in db
+	return &pb.RecordValue{Value: s.db[in.Key]}, nil
 }
 
 func main() {
