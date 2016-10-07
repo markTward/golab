@@ -48,21 +48,21 @@ func hello(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 	c := pb.NewGreeterClient(conn)
 
-	// examine query string if 'name' key exists, send to server, otherwise default
-	name := defaultName
-	qsname, ok := r.URL.Query()["name"]
-	// qsname, ok := qs["name"]
-
-	if ok {
-		name = qsname[0]
+	// examine query string if one/many 'name' keys exists
+	// if empty, provide default
+	qsnames, ok := r.URL.Query()["name"]
+	if !ok {
+		qsnames = append(qsnames, defaultName)
 	}
 
-	// Contact the server and print out its response.
-	rpc, err := c.SayHello(context.Background(), &pb.HelloRequest{Name: name})
-	if err != nil {
-		log.Fatalf("could not greet: %v", err)
+	// Contact gRPC helloworld server over range of names
+	for _, name := range qsnames {
+		rpc, err := c.SayHello(context.Background(), &pb.HelloRequest{Name: name})
+		if err != nil {
+			log.Fatalf("could not greet: %v", err)
+		}
+		fmt.Fprintf(w, "Greeting: %s\n", rpc.Message)
 	}
-	fmt.Fprintf(w, "Greeting: %s\n", rpc.Message)
 
 }
 
