@@ -22,6 +22,7 @@ const (
 	addressHW   = "localhost:50051"
 	addressDB   = "localhost:50052"
 	defaultName = "world"
+	defaultKey  = ""
 )
 
 func main() {
@@ -29,7 +30,40 @@ func main() {
 	http.HandleFunc("/query", query)
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/helloagain", helloAgain)
+	http.HandleFunc("/db/read", readRecord)
+
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
+}
+
+func readRecord(w http.ResponseWriter, r *http.Request) {
+	// Set up a connection to the server.
+	conn, err := grpc.Dial(addressDB, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+
+	c := pbdb.NewRecordReaderClient(conn)
+
+	// examine query string if one/many 'name' keys exists
+	// if empty, provide default
+	qskeys, ok := r.URL.Query()["key"]
+	if !ok {
+		qskeys = append(qskeys, defaultKey)
+	}
+
+	// Contact gRPC helloworld server over range of names
+	for _, key := range qskeys {
+
+		rpc, err := c.Read(context.Background(), &pbdb.RecordKey{Key: key})
+
+		if err != nil {
+			log.Fatalf("could not find record: %v", err)
+		}
+		fmt.Fprintf(w, "Record Path / Query / Value: %v :: %v :: %v\n", r.URL.Path, r.URL.Query(), rpc.Value)
+		// fmt.Fprintf(w, "Record Value: %s\n", rpc.Value)
+	}
+
 }
 
 // handler echoes the Path component of the requested URL.
@@ -71,13 +105,13 @@ func hello(w http.ResponseWriter, r *http.Request) {
 
 func helloAgain(w http.ResponseWriter, r *http.Request) {
 	// Set up a connection to the server.
-	conn, err := grpc.Dial(addressDB, grpc.WithInsecure())
+	conn, err := grpc.Dial(addressHW, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
 
-	c := pbdb.NewGreeterClient(conn)
+	c := pbhw.NewGreeterClient(conn)
 
 	// examine query string if one/many 'name' keys exists
 	// if empty, provide default
@@ -88,7 +122,7 @@ func helloAgain(w http.ResponseWriter, r *http.Request) {
 
 	// Contact gRPC helloworld server over range of names
 	for _, name := range qsnames {
-		rpc, err := c.SayHelloAgain(context.Background(), &pbdb.HelloRequest{Name: name})
+		rpc, err := c.SayHelloAgain(context.Background(), &pbhw.HelloRequest{Name: name})
 		if err != nil {
 			log.Fatalf("could not greet: %v", err)
 		}

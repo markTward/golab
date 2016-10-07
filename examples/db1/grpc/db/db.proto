@@ -36,17 +36,17 @@ option java_outer_classname = "DB1Proto";
 package db;
 
 // The greeting service definition.
-service Greeter {
+service RecordReader {
   // Sends a greeting
-  rpc SayHelloAgain (HelloRequest) returns (HelloReply) {}
+  rpc Read (RecordKey) returns (RecordValue) {}
 }
 
 // The request message containing the user's name.
-message HelloRequest {
-  string name = 1;
+message RecordKey {
+  string key = 1;
 }
 
 // The response message containing the greetings
-message HelloReply {
-  string message = 1;
+message RecordValue {
+  string value = 1;
 }

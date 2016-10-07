@@ -38,8 +38,9 @@ import (
 	"log"
 	"net"
 
-	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+
+	"golang.org/x/net/context"
 
 	pb "github.com/markTward/grpc-demo/examples/db1/grpc/db"
 )
@@ -48,11 +49,22 @@ const (
 	port = ":50052"
 )
 
-// server is used to implement helloworld.GreeterServer.
-type server struct{}
+// server is used to implement db service.
+type server struct {
+	db map[string]string
+}
 
-func (s *server) SayHelloAgain(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	return &pb.HelloReply{Message: "Hello AGAIN " + in.Name}, nil
+// create and seed database
+func newDBServer() *server {
+	s := new(server)
+	s.db = make(map[string]string)
+	s.db["hello"] = "world"
+	return s
+}
+
+// attempt key/value lookup into db
+func (s *server) Read(ctx context.Context, in *pb.RecordKey) (*pb.RecordValue, error) {
+	return &pb.RecordValue{Value: "Value: " + s.db[in.Key]}, nil
 }
 
 func main() {
@@ -60,8 +72,14 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
+	// declare new grpc server using db service
 	s := grpc.NewServer()
-	pb.RegisterGreeterServer(s, &server{})
+	pb.RegisterRecordReaderServer(s, newDBServer())
+
+	// debug output for service
 	fmt.Println(s.GetServiceInfo())
+
+	// start server
 	s.Serve(lis)
 }
