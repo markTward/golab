@@ -12,13 +12,15 @@ import (
 	"log"
 	"net/http"
 
+	pbdb "github.com/markTward/grpc-demo/examples/db1/grpc/db"
 	pbhw "github.com/markTward/grpc-demo/examples/db1/grpc/hw"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
 
 const (
-	address     = "localhost:50051"
+	addressHW   = "localhost:50051"
+	addressDB   = "localhost:50052"
 	defaultName = "world"
 )
 
@@ -26,6 +28,7 @@ func main() {
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/query", query)
 	http.HandleFunc("/hello", hello)
+	http.HandleFunc("/helloagain", helloAgain)
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
 }
 
@@ -41,7 +44,7 @@ func query(w http.ResponseWriter, r *http.Request) {
 
 func hello(w http.ResponseWriter, r *http.Request) {
 	// Set up a connection to the server.
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.Dial(addressHW, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
@@ -62,6 +65,34 @@ func hello(w http.ResponseWriter, r *http.Request) {
 			log.Fatalf("could not greet: %v", err)
 		}
 		fmt.Fprintf(w, "Greeting: %s\n", rpc.Message)
+	}
+
+}
+
+func helloAgain(w http.ResponseWriter, r *http.Request) {
+	// Set up a connection to the server.
+	conn, err := grpc.Dial(addressDB, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+
+	c := pbdb.NewGreeterClient(conn)
+
+	// examine query string if one/many 'name' keys exists
+	// if empty, provide default
+	qsnames, ok := r.URL.Query()["name"]
+	if !ok {
+		qsnames = append(qsnames, defaultName)
+	}
+
+	// Contact gRPC helloworld server over range of names
+	for _, name := range qsnames {
+		rpc, err := c.SayHelloAgain(context.Background(), &pbdb.HelloRequest{Name: name})
+		if err != nil {
+			log.Fatalf("could not greet: %v", err)
+		}
+		fmt.Fprintf(w, "Greeting Again from new GRPC: %s\n", rpc.Message)
 	}
 
 }

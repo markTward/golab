@@ -40,20 +40,16 @@ import (
 
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	pb "google.golang.org/grpc/examples/helloworld/helloworld"
+
+	pb "github.com/markTward/grpc-demo/examples/db1/grpc/db"
 )
 
 const (
-	port = ":50051"
+	port = ":50052"
 )
 
 // server is used to implement helloworld.GreeterServer.
 type server struct{}
-
-// SayHello implements helloworld.GreeterServer
-func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	return &pb.HelloReply{Message: "Hello " + in.Name}, nil
-}
 
 func (s *server) SayHelloAgain(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
 	return &pb.HelloReply{Message: "Hello AGAIN " + in.Name}, nil
