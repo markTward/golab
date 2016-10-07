@@ -54,14 +54,12 @@ func readRecord(w http.ResponseWriter, r *http.Request) {
 
 	// Contact gRPC helloworld server over range of names
 	for _, key := range qskeys {
-
 		rpc, err := c.Read(context.Background(), &pbdb.RecordKey{Key: key})
 
 		if err != nil {
 			log.Fatalf("could not find record: %v", err)
 		}
-		fmt.Fprintf(w, "Record Path / Query / Value: %v :: %v :: %v\n", r.URL.Path, r.URL.Query(), rpc.Value)
-		// fmt.Fprintf(w, "Record Value: %s\n", rpc.Value)
+		fmt.Fprintf(w, "db[%v]=%v\n", key, rpc.Value)
 	}
 
 }

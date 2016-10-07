@@ -37,6 +37,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"sync"
 
 	"google.golang.org/grpc"
 
@@ -51,6 +52,7 @@ const (
 
 // server is used to implement db service.
 type server struct {
+	mu sync.Mutex
 	db map[string]string
 }
 
@@ -64,7 +66,10 @@ func newDBServer() *server {
 
 // attempt key/value lookup into db
 func (s *server) Read(ctx context.Context, in *pb.RecordKey) (*pb.RecordValue, error) {
-	return &pb.RecordValue{Value: "Value: " + s.db[in.Key]}, nil
+	s.mu.Lock()
+	v := s.db[in.Key]
+	s.mu.Unlock()
+	return &pb.RecordValue{Value: v}, nil
 }
 
 func main() {
