@@ -12,7 +12,7 @@ import (
 	"log"
 	"net/http"
 
-	pb "github.com/markTward/grpc-demo/examples/db1/db"
+	pbhw "github.com/markTward/grpc-demo/examples/db1/grpc/hw"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
@@ -46,7 +46,7 @@ func hello(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-	c := pb.NewGreeterClient(conn)
+	c := pbhw.NewGreeterClient(conn)
 
 	// examine query string if one/many 'name' keys exists
 	// if empty, provide default
@@ -57,7 +57,7 @@ func hello(w http.ResponseWriter, r *http.Request) {
 
 	// Contact gRPC helloworld server over range of names
 	for _, name := range qsnames {
-		rpc, err := c.SayHello(context.Background(), &pb.HelloRequest{Name: name})
+		rpc, err := c.SayHello(context.Background(), &pbhw.HelloRequest{Name: name})
 		if err != nil {
 			log.Fatalf("could not greet: %v", err)
 		}
