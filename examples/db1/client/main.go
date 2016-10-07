@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	pb "github.com/markTward/grpc-demo/examples/db1/db"
 	"golang.org/x/net/context"
@@ -49,12 +48,16 @@ func hello(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 	c := pb.NewGreeterClient(conn)
 
-	// Contact the server and print out its response.
+	// examine query string if 'name' key exists, send to server, otherwise default
 	name := defaultName
-	if len(os.Args) > 1 {
-		name = os.Args[1]
+	qsname, ok := r.URL.Query()["name"]
+	// qsname, ok := qs["name"]
+
+	if ok {
+		name = qsname[0]
 	}
 
+	// Contact the server and print out its response.
 	rpc, err := c.SayHello(context.Background(), &pb.HelloRequest{Name: name})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
