@@ -22,3 +22,6 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+# Proto Buffer Auto-generated File
+*.pb.go

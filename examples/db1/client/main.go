@@ -11,11 +11,22 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+
+	pb "github.com/markTward/grpc-demo/examples/db1/db"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
+)
+
+const (
+	address     = "localhost:50051"
+	defaultName = "world"
 )
 
 func main() {
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/query", query)
+	http.HandleFunc("/hello", hello)
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
 }
 
@@ -27,6 +38,29 @@ func handler(w http.ResponseWriter, r *http.Request) {
 // counter echoes the number of calls so far.
 func query(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Query %v\tString %v\n", r.URL.Path, r.URL.Query())
+}
+
+func hello(w http.ResponseWriter, r *http.Request) {
+	// Set up a connection to the server.
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	c := pb.NewGreeterClient(conn)
+
+	// Contact the server and print out its response.
+	name := defaultName
+	if len(os.Args) > 1 {
+		name = os.Args[1]
+	}
+
+	rpc, err := c.SayHello(context.Background(), &pb.HelloRequest{Name: name})
+	if err != nil {
+		log.Fatalf("could not greet: %v", err)
+	}
+	fmt.Fprintf(w, "Greeting: %s\n", rpc.Message)
+
 }
 
 //!-
