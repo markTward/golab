@@ -53,6 +53,7 @@ func dbRead(w http.ResponseWriter, r *http.Request) {
 		qskeys = append(qskeys, defaultKey)
 	}
 
+	// TODO: submit qskeys as array to server; server returns array of values rather than iterating in client
 	// Contact gRPC helloworld server over range of names
 	for _, key := range qskeys {
 		rpc, err := c.Read(context.Background(), &pbdb.ReadRequest{Key: key})
@@ -75,16 +76,29 @@ func dbUpsert(w http.ResponseWriter, r *http.Request) {
 
 	c := pbdb.NewDBServiceClient(conn)
 
-	// examine query string if one/many 'name' keys exists
-	// if empty, provide default
-	// qskeys, ok := r.URL.Query()["key"]
-	// if !ok {
-	// 	qskeys = append(qskeys, defaultKey)
-	// }
+	fmt.Fprintf(w, "DEBUG URL Query(): %v\n", r.URL.Query())
 
-	// Contact gRPC helloworld server over range of names
-	key := r.URL.Query()["key"][0]
-	value := r.URL.Query()["value"][0]
+	// TODO: move validation logic to server side, returning bad request / error
+	// key/value pair validations:
+	// 1 and only 1 key required
+	// 0 or 1 value required
+	var key, value string
+
+	if len(r.URL.Query()["key"]) != 1 {
+		fmt.Fprintf(w, "%v\t1 and only 1 value allowed: %v\n", http.StatusBadRequest, r.URL.Query()["key"])
+		return
+	} else {
+		key = r.URL.Query()["key"][0]
+	}
+
+	if len(r.URL.Query()["value"]) > 1 {
+		fmt.Fprintf(w, "%v\t0 or only 1 value allowed: %v\n", http.StatusBadRequest, r.URL.Query()["value"])
+		return
+	} else {
+		if len(r.URL.Query()["value"]) == 1 {
+			value = r.URL.Query()["value"][0]
+		}
+	}
 
 	rpc, err := c.Upsert(context.Background(), &pbdb.UpsertRequest{Key: key, Value: value})
 	if err != nil {
