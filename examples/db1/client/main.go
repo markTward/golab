@@ -27,7 +27,6 @@ const (
 
 func main() {
 	http.HandleFunc("/", handler)
-	http.HandleFunc("/query", query)
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/helloagain", helloAgain)
 	http.HandleFunc("/db/read", dbRead)
@@ -107,11 +106,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "URL.Path = %q\n", r.URL.Path)
 }
 
-// counter echoes the number of calls so far.
-func query(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Query %v\tString %v\n", r.URL.Path, r.URL.Query())
-}
-
+// including hello/again as test/example for using grpc 2nd service and multiple protocol buffers
 func hello(w http.ResponseWriter, r *http.Request) {
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(addressHW, grpc.WithInsecure())
