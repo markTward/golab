@@ -80,15 +80,16 @@ func (s *server) ReadMulti(ctx context.Context, in *pb.ReadMultiRequest) (*pb.Re
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	// consturct values array for multiple keys
 	var values []string
-	for _, key := range in.Key {
+	for _, key := range in.Keys {
 		values = append(values, s.db[key])
 	}
 
-	log.Printf("server Key: %v\t Value: %v\n", in.Key, values)
+	log.Printf("ReadMulti: Keys: %v\t Values: %v\n", in.Keys, values)
 
 	// lookup key in db
-	return &pb.ReadMultiReply{Value: values}, nil
+	return &pb.ReadMultiReply{Values: values}, nil
 }
 
 // attempt key/value insert/update into db

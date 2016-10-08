@@ -55,12 +55,12 @@ message ReadReply {
 
 // The request message containing the user's name.
 message ReadMultiRequest {
-  repeated string key = 1;
+  repeated string keys = 1;
 }
 
 // The response message containing the greetings
 message ReadMultiReply {
-  repeated string value = 1;
+  repeated string values = 1;
 }
 
 message UpsertRequest {

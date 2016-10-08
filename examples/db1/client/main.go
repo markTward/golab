@@ -47,10 +47,15 @@ func dbReadMulti(w http.ResponseWriter, r *http.Request) {
 
 	c := pbdb.NewDBServiceClient(conn)
 
-	key := r.URL.Query()["key"]
-	rpc, err := c.ReadMulti(context.Background(), &pbdb.ReadMultiRequest{Key: key})
+	keys := r.URL.Query()["key"]
 
-	fmt.Fprintf(w, "client Key: %v\t Value: %v\n", key, rpc.Value)
+	rpc, err := c.ReadMulti(context.Background(), &pbdb.ReadMultiRequest{Keys: keys})
+
+	log.Printf("dbReadMulti: Keys: %v\t Values: %v\n", keys, rpc.Values)
+
+	for idx, key := range keys {
+		fmt.Fprintf(w, "Key: %v\t Value: %v\n", key, rpc.Values[idx])
+	}
 
 }
 
@@ -120,7 +125,7 @@ func dbUpsert(w http.ResponseWriter, r *http.Request) {
 
 	rpc, err := c.Upsert(context.Background(), &pbdb.UpsertRequest{Key: key, Value: value})
 	if err != nil {
-		log.Fatalf("could not upsert record: %v", err)
+		fmt.Fprintf(w, "could not upsert record: %v", err)
 	}
 	fmt.Fprintf(w, "db[%v]=%v\n", key, rpc.Value)
 
