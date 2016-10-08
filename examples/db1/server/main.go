@@ -80,8 +80,9 @@ func (s *server) Upsert(ctx context.Context, in *pb.UpsertRequest) (*pb.UpsertRe
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// lookup key in db
-	return &pb.UpsertReply{Value: "s.db[in.Key]"}, nil
+	// assign value to key in db
+	s.db[in.Key] = in.Value
+	return &pb.UpsertReply{Value: s.db[in.Key]}, nil
 }
 
 func main() {

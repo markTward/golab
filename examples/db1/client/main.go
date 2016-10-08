@@ -31,6 +31,7 @@ func main() {
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/helloagain", helloAgain)
 	http.HandleFunc("/db/read", dbRead)
+	http.HandleFunc("/db/upsert", dbUpsert)
 
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
 }
@@ -61,6 +62,35 @@ func dbRead(w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Fprintf(w, "db[%v]=%v\n", key, rpc.Value)
 	}
+
+}
+
+func dbUpsert(w http.ResponseWriter, r *http.Request) {
+	// Set up a connection to the server.
+	conn, err := grpc.Dial(addressDB, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+
+	c := pbdb.NewDBServiceClient(conn)
+
+	// examine query string if one/many 'name' keys exists
+	// if empty, provide default
+	// qskeys, ok := r.URL.Query()["key"]
+	// if !ok {
+	// 	qskeys = append(qskeys, defaultKey)
+	// }
+
+	// Contact gRPC helloworld server over range of names
+	key := r.URL.Query()["key"][0]
+	value := r.URL.Query()["value"][0]
+
+	rpc, err := c.Upsert(context.Background(), &pbdb.UpsertRequest{Key: key, Value: value})
+	if err != nil {
+		log.Fatalf("could not upsert record: %v", err)
+	}
+	fmt.Fprintf(w, "db[%v]=%v\n", key, rpc.Value)
 
 }
 
