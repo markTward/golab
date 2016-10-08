@@ -74,6 +74,23 @@ func (s *server) Read(ctx context.Context, in *pb.ReadRequest) (*pb.ReadReply, e
 	return &pb.ReadReply{Value: s.db[in.Key]}, nil
 }
 
+// attempt key/value lookup into db
+func (s *server) ReadMulti(ctx context.Context, in *pb.ReadMultiRequest) (*pb.ReadMultiReply, error) {
+	// get exclusive lock on server, deferring close
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	var values []string
+	for _, key := range in.Key {
+		values = append(values, s.db[key])
+	}
+
+	log.Printf("server Key: %v\t Value: %v\n", in.Key, values)
+
+	// lookup key in db
+	return &pb.ReadMultiReply{Value: values}, nil
+}
+
 // attempt key/value insert/update into db
 func (s *server) Upsert(ctx context.Context, in *pb.UpsertRequest) (*pb.UpsertReply, error) {
 	// get exclusive lock on server, deferring close

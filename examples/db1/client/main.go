@@ -31,9 +31,27 @@ func main() {
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/helloagain", helloAgain)
 	http.HandleFunc("/db/read", dbRead)
+	http.HandleFunc("/db/readmulti", dbReadMulti)
 	http.HandleFunc("/db/upsert", dbUpsert)
 
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
+}
+
+func dbReadMulti(w http.ResponseWriter, r *http.Request) {
+	// Set up a connection to the server.
+	conn, err := grpc.Dial(addressDB, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+
+	c := pbdb.NewDBServiceClient(conn)
+
+	key := r.URL.Query()["key"]
+	rpc, err := c.ReadMulti(context.Background(), &pbdb.ReadMultiRequest{Key: key})
+
+	fmt.Fprintf(w, "client Key: %v\t Value: %v\n", key, rpc.Value)
+
 }
 
 func dbRead(w http.ResponseWriter, r *http.Request) {
