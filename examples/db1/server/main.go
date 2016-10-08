@@ -65,17 +65,17 @@ func newDBServer() *server {
 }
 
 // attempt key/value lookup into db
-func (s *server) Read(ctx context.Context, in *pb.ReadRequest) (*pb.ReadReply, error) {
-	// get exclusive lock on server, deferring close
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	// lookup key in db
-	return &pb.ReadReply{Value: s.db[in.Key]}, nil
-}
+// func (s *server) Read(ctx context.Context, in *pb.ReadRequest) (*pb.ReadReply, error) {
+// 	// get exclusive lock on server, deferring close
+// 	s.mu.Lock()
+// 	defer s.mu.Unlock()
+//
+// 	// lookup key in db
+// 	return &pb.ReadReply{Value: s.db[in.Key]}, nil
+// }
 
 // attempt key/value lookup into db
-func (s *server) ReadMulti(ctx context.Context, in *pb.ReadMultiRequest) (*pb.ReadMultiReply, error) {
+func (s *server) Read(ctx context.Context, in *pb.ReadRequest) (*pb.ReadReply, error) {
 	// get exclusive lock on server, deferring close
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -86,10 +86,10 @@ func (s *server) ReadMulti(ctx context.Context, in *pb.ReadMultiRequest) (*pb.Re
 		values = append(values, s.db[key])
 	}
 
-	log.Printf("ReadMulti: Keys: %v\t Values: %v\n", in.Keys, values)
+	log.Printf("Read: Keys: %v\t Values: %v\n", in.Keys, values)
 
 	// lookup key in db
-	return &pb.ReadMultiReply{Values: values}, nil
+	return &pb.ReadReply{Values: values}, nil
 }
 
 // attempt key/value insert/update into db
@@ -100,6 +100,8 @@ func (s *server) Upsert(ctx context.Context, in *pb.UpsertRequest) (*pb.UpsertRe
 
 	// assign value to key in db
 	s.db[in.Key] = in.Value
+	log.Printf("Upsert: Key: %v\t Value: %v\n", in.Key, in.Value)
+
 	return &pb.UpsertReply{Value: s.db[in.Key]}, nil
 }
 

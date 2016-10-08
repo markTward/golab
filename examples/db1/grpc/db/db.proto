@@ -40,26 +40,15 @@ service DBService {
   // Sends a greeting
   rpc Read (ReadRequest) returns (ReadReply) {}
   rpc Upsert (UpsertRequest) returns (UpsertReply) {}
-  rpc ReadMulti (ReadMultiRequest) returns (ReadMultiReply) {}
 }
 
 // The request message containing the user's name.
 message ReadRequest {
-  string key = 1;
-}
-
-// The response message containing the greetings
-message ReadReply {
-  string value = 1;
-}
-
-// The request message containing the user's name.
-message ReadMultiRequest {
   repeated string keys = 1;
 }
 
 // The response message containing the greetings
-message ReadMultiReply {
+message ReadReply {
   repeated string values = 1;
 }
 

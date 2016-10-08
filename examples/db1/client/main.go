@@ -31,17 +31,16 @@ func main() {
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/helloagain", helloAgain)
 	http.HandleFunc("/db/read", dbRead)
-	http.HandleFunc("/db/readmulti", dbReadMulti)
 	http.HandleFunc("/db/upsert", dbUpsert)
 
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
 }
 
-func dbReadMulti(w http.ResponseWriter, r *http.Request) {
+func dbRead(w http.ResponseWriter, r *http.Request) {
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(addressDB, grpc.WithInsecure())
 	if err != nil {
-		log.Fatalf("did not connect: %v", err)
+		log.Printf("did not connect: %v", err)
 	}
 	defer conn.Close()
 
@@ -49,42 +48,12 @@ func dbReadMulti(w http.ResponseWriter, r *http.Request) {
 
 	keys := r.URL.Query()["key"]
 
-	rpc, err := c.ReadMulti(context.Background(), &pbdb.ReadMultiRequest{Keys: keys})
+	rpc, err := c.Read(context.Background(), &pbdb.ReadRequest{Keys: keys})
 
-	log.Printf("dbReadMulti: Keys: %v\t Values: %v\n", keys, rpc.Values)
+	log.Printf("dbRead: Keys: %v\t Values: %v\n", keys, rpc.Values)
 
 	for idx, key := range keys {
 		fmt.Fprintf(w, "Key: %v\t Value: %v\n", key, rpc.Values[idx])
-	}
-
-}
-
-func dbRead(w http.ResponseWriter, r *http.Request) {
-	// Set up a connection to the server.
-	conn, err := grpc.Dial(addressDB, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
-	defer conn.Close()
-
-	c := pbdb.NewDBServiceClient(conn)
-
-	// examine query string if one/many 'name' keys exists
-	// if empty, provide default
-	qskeys, ok := r.URL.Query()["key"]
-	if !ok {
-		qskeys = append(qskeys, defaultKey)
-	}
-
-	// TODO: submit qskeys as array to server; server returns array of values rather than iterating in client
-	// Contact gRPC helloworld server over range of names
-	for _, key := range qskeys {
-		rpc, err := c.Read(context.Background(), &pbdb.ReadRequest{Key: key})
-
-		if err != nil {
-			log.Fatalf("could not find record: %v", err)
-		}
-		fmt.Fprintf(w, "db[%v]=%v\n", key, rpc.Value)
 	}
 
 }
@@ -93,7 +62,7 @@ func dbUpsert(w http.ResponseWriter, r *http.Request) {
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(addressDB, grpc.WithInsecure())
 	if err != nil {
-		log.Fatalf("did not connect: %v", err)
+		log.Printf("did not connect: %v", err)
 	}
 	defer conn.Close()
 
@@ -123,9 +92,11 @@ func dbUpsert(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	log.Printf("dbUpsert: Key: %v\t Value: %v\n", key, value)
+
 	rpc, err := c.Upsert(context.Background(), &pbdb.UpsertRequest{Key: key, Value: value})
 	if err != nil {
-		fmt.Fprintf(w, "could not upsert record: %v", err)
+		log.Printf("could not upsert record: %v", err)
 	}
 	fmt.Fprintf(w, "db[%v]=%v\n", key, rpc.Value)
 
