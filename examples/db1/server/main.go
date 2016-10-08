@@ -74,6 +74,16 @@ func (s *server) Read(ctx context.Context, in *pb.ReadRequest) (*pb.ReadReply, e
 	return &pb.ReadReply{Value: s.db[in.Key]}, nil
 }
 
+// attempt key/value insert/update into db
+func (s *server) Upsert(ctx context.Context, in *pb.UpsertRequest) (*pb.UpsertReply, error) {
+	// get exclusive lock on server, deferring close
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	// lookup key in db
+	return &pb.UpsertReply{Value: "s.db[in.Key]"}, nil
+}
+
 func main() {
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
@@ -82,7 +92,7 @@ func main() {
 
 	// declare new grpc server using db service
 	s := grpc.NewServer()
-	pb.RegisterDBReaderServer(s, newDBServer())
+	pb.RegisterDBServiceServer(s, newDBServer())
 
 	// debug output for service
 	fmt.Println(s.GetServiceInfo())

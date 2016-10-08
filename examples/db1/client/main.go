@@ -30,12 +30,12 @@ func main() {
 	http.HandleFunc("/query", query)
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/helloagain", helloAgain)
-	http.HandleFunc("/db/read", readRecord)
+	http.HandleFunc("/db/read", dbRead)
 
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
 }
 
-func readRecord(w http.ResponseWriter, r *http.Request) {
+func dbRead(w http.ResponseWriter, r *http.Request) {
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(addressDB, grpc.WithInsecure())
 	if err != nil {
@@ -43,7 +43,7 @@ func readRecord(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close()
 
-	c := pbdb.NewDBReaderClient(conn)
+	c := pbdb.NewDBServiceClient(conn)
 
 	// examine query string if one/many 'name' keys exists
 	// if empty, provide default
