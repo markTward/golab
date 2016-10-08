@@ -43,7 +43,7 @@ func readRecord(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close()
 
-	c := pbdb.NewRecordReaderClient(conn)
+	c := pbdb.NewDBReaderClient(conn)
 
 	// examine query string if one/many 'name' keys exists
 	// if empty, provide default
@@ -54,7 +54,7 @@ func readRecord(w http.ResponseWriter, r *http.Request) {
 
 	// Contact gRPC helloworld server over range of names
 	for _, key := range qskeys {
-		rpc, err := c.Read(context.Background(), &pbdb.RecordKey{Key: key})
+		rpc, err := c.Read(context.Background(), &pbdb.ReadRequest{Key: key})
 
 		if err != nil {
 			log.Fatalf("could not find record: %v", err)

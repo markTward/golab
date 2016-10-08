@@ -65,13 +65,13 @@ func newDBServer() *server {
 }
 
 // attempt key/value lookup into db
-func (s *server) Read(ctx context.Context, in *pb.RecordKey) (*pb.RecordValue, error) {
+func (s *server) Read(ctx context.Context, in *pb.ReadRequest) (*pb.ReadReply, error) {
 	// get exclusive lock on server, deferring close
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	// lookup key in db
-	return &pb.RecordValue{Value: s.db[in.Key]}, nil
+	return &pb.ReadReply{Value: s.db[in.Key]}, nil
 }
 
 func main() {
@@ -82,7 +82,7 @@ func main() {
 
 	// declare new grpc server using db service
 	s := grpc.NewServer()
-	pb.RegisterRecordReaderServer(s, newDBServer())
+	pb.RegisterDBReaderServer(s, newDBServer())
 
 	// debug output for service
 	fmt.Println(s.GetServiceInfo())
