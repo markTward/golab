@@ -25,6 +25,8 @@ const (
 	defaultKey  = ""
 )
 
+var tokens = make(chan struct{}, 25)
+
 func main() {
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/hello", hello)
@@ -47,7 +49,10 @@ func dbRead(w http.ResponseWriter, r *http.Request) {
 
 	keys := r.URL.Query()["key"]
 
+	// acquire/release worker via buffered tokens channel
+	tokens <- struct{}{}
 	rpc, err := c.Read(context.Background(), &pbdb.ReadRequest{Keys: keys})
+	<-tokens
 
 	log.Printf("dbRead: Keys: %v\t Values: %v\n", keys, rpc.Values)
 
@@ -93,7 +98,11 @@ func dbUpsert(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("dbUpsert: Key: %v\t Value: %v\n", key, value)
 
+	// acquire/release worker via buffered tokens channel
+	tokens <- struct{}{}
 	rpc, err := c.Upsert(context.Background(), &pbdb.UpsertRequest{Key: key, Value: value})
+	<-tokens
+
 	if err != nil {
 		log.Printf("could not upsert record: %v", err)
 	}
