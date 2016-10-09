@@ -51,7 +51,6 @@ func dbRead(w http.ResponseWriter, r *http.Request) {
 
 	// acquire/release worker via buffered tokens channel
 	tokens <- struct{}{}
-	log.Println("tokens len / cap:", len(tokens), cap(tokens))
 	rpc, err := c.Read(context.Background(), &pbdb.ReadRequest{Keys: keys})
 	<-tokens
 
