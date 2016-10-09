@@ -60,21 +60,10 @@ type server struct {
 func newDBServer() *server {
 	s := new(server)
 	s.db = make(map[string]string)
-	s.db["hello"] = "world"
 	return s
 }
 
-// attempt key/value lookup into db
-// func (s *server) Read(ctx context.Context, in *pb.ReadRequest) (*pb.ReadReply, error) {
-// 	// get exclusive lock on server, deferring close
-// 	s.mu.Lock()
-// 	defer s.mu.Unlock()
-//
-// 	// lookup key in db
-// 	return &pb.ReadReply{Value: s.db[in.Key]}, nil
-// }
-
-// attempt key/value lookup into db
+// attempt lookup into db over range of keys / values
 func (s *server) Read(ctx context.Context, in *pb.ReadRequest) (*pb.ReadReply, error) {
 	// get exclusive lock on server, deferring close
 	s.mu.Lock()
