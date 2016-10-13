@@ -9,9 +9,10 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"net/http"
+
+	"github.com/markTward/grpc-demo/examples/db1/client/handlers"
 
 	pbdb "github.com/markTward/grpc-demo/examples/db1/grpc/db"
 	"golang.org/x/net/context"
@@ -28,16 +29,9 @@ func main() {
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/db/read", dbRead)
 	http.HandleFunc("/db/upsert", dbUpsert)
-	http.HandleFunc("/healthcheck", HealthCheck)
+	http.HandleFunc("/healthcheck", handlers.HealthCheck)
 
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
-}
-
-func HealthCheck(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-type", "application/json")
-	is_alive := `{"is_alive": "true"}`
-	io.WriteString(w, is_alive)
 }
 
 func dbRead(w http.ResponseWriter, r *http.Request) {
