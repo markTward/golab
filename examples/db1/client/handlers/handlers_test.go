@@ -43,3 +43,29 @@ func TestHealthCheck(t *testing.T) {
 		t.Errorf("handler return unexpected body: expected %v received %v", expected, rr.Body.String())
 	}
 }
+
+func BenchmarkHealthCheck(b *testing.B) {
+	// create request for handler
+	for i := 0; i < b.N; i++ {
+		resp, err := http.Get("http://localhost:8000/healthcheck")
+
+		if err != nil {
+			b.Log(err, resp)
+		}
+	}
+
+}
+
+func BenchmarkRead(b *testing.B) {
+	// setup: push URL into DB with Upsert
+
+	// create request for handler
+	for i := 0; i < b.N; i++ {
+		resp, err := http.Get("http://localhost:8000/db/read?key=Hello")
+
+		if err != nil {
+			b.Log(err, resp)
+		}
+	}
+
+}
