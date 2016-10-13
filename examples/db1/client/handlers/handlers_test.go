@@ -30,7 +30,8 @@ func TestHealthCheck(t *testing.T) {
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(HealthCheck)
 
-	// Pass request to mock server
+	// handler satisfies http.Handler, so ServeHTTP method can be called and
+	// Request and ResponseRecorder passed directly
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusOK {
 		t.Errorf("handler returned incorrect response code.  expected %v received %v", status, http.StatusOK)
