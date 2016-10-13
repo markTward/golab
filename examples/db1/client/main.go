@@ -9,6 +9,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 
@@ -33,8 +34,15 @@ func main() {
 	http.HandleFunc("/helloagain", helloAgain)
 	http.HandleFunc("/db/read", dbRead)
 	http.HandleFunc("/db/upsert", dbUpsert)
+	http.HandleFunc("/healthcheck", HealthCheck)
 
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
+}
+func HealthCheck(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-type", "application/json")
+	is_alive := `{"is_alive": "true"}`
+	io.WriteString(w, is_alive)
 }
 
 func dbRead(w http.ResponseWriter, r *http.Request) {
