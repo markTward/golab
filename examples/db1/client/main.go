@@ -14,30 +14,25 @@ import (
 	"net/http"
 
 	pbdb "github.com/markTward/grpc-demo/examples/db1/grpc/db"
-	pbhw "github.com/markTward/grpc-demo/examples/db1/grpc/hw"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
 
 const (
-	addressHW   = "localhost:50051"
-	addressDB   = "localhost:50052"
-	defaultName = "world"
-	defaultKey  = ""
+	addressDB = "localhost:50052"
 )
 
 var tokens = make(chan struct{}, 100)
 
 func main() {
 	http.HandleFunc("/", handler)
-	http.HandleFunc("/hello", hello)
-	http.HandleFunc("/helloagain", helloAgain)
 	http.HandleFunc("/db/read", dbRead)
 	http.HandleFunc("/db/upsert", dbUpsert)
 	http.HandleFunc("/healthcheck", HealthCheck)
 
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
 }
+
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-type", "application/json")
@@ -122,61 +117,3 @@ func dbUpsert(w http.ResponseWriter, r *http.Request) {
 func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "URL.Path = %q\n", r.URL.Path)
 }
-
-// including hello/again as test/example for using grpc 2nd service and multiple protocol buffers
-func hello(w http.ResponseWriter, r *http.Request) {
-	// Set up a connection to the server.
-	conn, err := grpc.Dial(addressHW, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
-	defer conn.Close()
-	c := pbhw.NewGreeterClient(conn)
-
-	// examine query string if one/many 'name' keys exists
-	// if empty, provide default
-	qsnames, ok := r.URL.Query()["name"]
-	if !ok {
-		qsnames = append(qsnames, defaultName)
-	}
-
-	// Contact gRPC helloworld server over range of names
-	for _, name := range qsnames {
-		rpc, err := c.SayHello(context.Background(), &pbhw.HelloRequest{Name: name})
-		if err != nil {
-			log.Fatalf("could not greet: %v", err)
-		}
-		fmt.Fprintf(w, "Greeting: %s\n", rpc.Message)
-	}
-
-}
-
-func helloAgain(w http.ResponseWriter, r *http.Request) {
-	// Set up a connection to the server.
-	conn, err := grpc.Dial(addressHW, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
-	defer conn.Close()
-
-	c := pbhw.NewGreeterClient(conn)
-
-	// examine query string if one/many 'name' keys exists
-	// if empty, provide default
-	qsnames, ok := r.URL.Query()["name"]
-	if !ok {
-		qsnames = append(qsnames, defaultName)
-	}
-
-	// Contact gRPC helloworld server over range of names
-	for _, name := range qsnames {
-		rpc, err := c.SayHelloAgain(context.Background(), &pbhw.HelloRequest{Name: name})
-		if err != nil {
-			log.Fatalf("could not greet: %v", err)
-		}
-		fmt.Fprintf(w, "Greeting Again from new GRPC: %s\n", rpc.Message)
-	}
-
-}
-
-//!-
