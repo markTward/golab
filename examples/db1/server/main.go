@@ -43,6 +43,8 @@ import (
 
 	"golang.org/x/net/context"
 
+	"google.golang.org/grpc/reflection"
+
 	pb "github.com/markTward/grpc-demo/examples/db1/grpc/db"
 )
 
@@ -103,6 +105,7 @@ func main() {
 	// declare new grpc server using db service
 	s := grpc.NewServer()
 	pb.RegisterDBServiceServer(s, newDBServer())
+	reflection.Register(s)
 
 	// debug output for service
 	fmt.Println(s.GetServiceInfo())

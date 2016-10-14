@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/markTward/tools"
 )
 
 func TestSanity(t *testing.T) {
@@ -58,14 +60,22 @@ func BenchmarkHealthCheck(b *testing.B) {
 
 func BenchmarkRead(b *testing.B) {
 	// setup: push URL into DB with Upsert
+	testValue := tools.RandomString(64)
+
+	resp, err := http.Get("http://localhost:8000/db/upsert?key=BenchmarkRead&value=" + testValue)
+	if err != nil {
+		b.Fatal("unable to create test benchmark record", resp, err)
+	}
 
 	// create request for handler
 	for i := 0; i < b.N; i++ {
-		resp, err := http.Get("http://localhost:8000/db/read?key=Hello")
+		resp, err := http.Get("http://localhost:8000/db/read?key=BenchmarkRead")
 
 		if err != nil {
 			b.Log(err, resp)
 		}
 	}
+
+	// teardown: delete key/value pair
 
 }

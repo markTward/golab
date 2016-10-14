@@ -15,10 +15,12 @@ import (
 )
 
 func main() {
+
 	http.HandleFunc("/", handlers.Base)
 	http.HandleFunc("/db/read", handlers.DBRead)
 	http.HandleFunc("/db/upsert", handlers.DBUpsert)
 	http.HandleFunc("/healthcheck", handlers.HealthCheck)
+	http.HandleFunc("/reflect", handlers.ReflectService)
 
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
 }
