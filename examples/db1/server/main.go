@@ -34,7 +34,10 @@
 package main
 
 import (
+	"bytes"
+	"compress/gzip"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"sync"
@@ -43,8 +46,8 @@ import (
 
 	"golang.org/x/net/context"
 
-	"google.golang.org/grpc/reflection"
-
+	"github.com/golang/protobuf/proto"
+	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	pb "github.com/markTward/grpc-demo/examples/db1/grpc/db"
 )
 
@@ -78,9 +81,67 @@ func (s *server) Read(ctx context.Context, in *pb.ReadRequest) (*pb.ReadReply, e
 	}
 
 	log.Printf("Read: Keys: %v\t Values: %v\n", in.Keys, values)
+	desc, _ := in.Descriptor()
+	log.Printf("Descriptor: %v\n", desc)
 
 	// lookup key in db
 	return &pb.ReadReply{Values: values}, nil
+}
+
+func (s *server) ServiceInfo(ctx context.Context, in *pb.ServiceInfoRequest) (*pb.ServiceInfoReply, error) {
+	si, _ := in.Descriptor()
+	fd, _ := decodeFileDesc(si)
+
+	log.Println("Decoded:", fd)
+
+	gs := fd.GetService()
+	log.Println("Service:", gs)
+
+	var md []string
+	for _, mt := range fd.GetMessageType() {
+		md = append(md, *mt.Name)
+	}
+	log.Println("metadata:", md)
+
+	// for _, mt := range fd.GetMessageType() {
+	// 	// fmt.Printf("message type: %T\t%v\n", mt, mt)
+	// 	fmt.Printf("Name:\t%v\n", *mt.Name)
+	// 	fmt.Println("Fields:")
+	// 	for _, f := range mt.Field {
+	// 		fmt.Printf("\t%v\n", f)
+	// 	}
+	// }
+
+	return &pb.ServiceInfoReply{Values: md}, nil
+}
+
+// decompress does gzip decompression.
+func decompress(b []byte) ([]byte, error) {
+	r, err := gzip.NewReader(bytes.NewReader(b))
+	if err != nil {
+		return nil, fmt.Errorf("bad gzipped descriptor: %v\n", err)
+	}
+	out, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, fmt.Errorf("bad gzipped descriptor: %v\n", err)
+	}
+
+	return out, nil
+}
+
+func decodeFileDesc(enc []byte) (*dpb.FileDescriptorProto, error) {
+	raw, err := decompress(enc)
+	fmt.Println("Decompressed:", raw)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decompress enc: %v", err)
+	}
+
+	fd := new(dpb.FileDescriptorProto)
+
+	if err := proto.Unmarshal(raw, fd); err != nil {
+		return nil, fmt.Errorf("bad descriptor: %v", err)
+	}
+	return fd, nil
 }
 
 // attempt key/value insert/update into db
@@ -92,6 +153,8 @@ func (s *server) Upsert(ctx context.Context, in *pb.UpsertRequest) (*pb.UpsertRe
 	// assign value to key in db
 	s.db[in.Key] = in.Value
 	log.Printf("Upsert: Key: %v\t Value: %v\n", in.Key, in.Value)
+	desc, _ := in.Descriptor()
+	log.Printf("Descriptor: %v\n", desc)
 
 	return &pb.UpsertReply{Value: s.db[in.Key]}, nil
 }
@@ -105,10 +168,9 @@ func main() {
 	// declare new grpc server using db service
 	s := grpc.NewServer()
 	pb.RegisterDBServiceServer(s, newDBServer())
-	reflection.Register(s)
 
-	// debug output for service
-	fmt.Println(s.GetServiceInfo())
+	// // debug output for service
+	// si := s.GetServiceInfo()
 
 	// start server
 	s.Serve(lis)

@@ -20,7 +20,7 @@ func main() {
 	http.HandleFunc("/db/read", handlers.DBRead)
 	http.HandleFunc("/db/upsert", handlers.DBUpsert)
 	http.HandleFunc("/healthcheck", handlers.HealthCheck)
-	http.HandleFunc("/reflect", handlers.ReflectService)
+	http.HandleFunc("/serviceinfo", handlers.ServiceInfo)
 
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
 }

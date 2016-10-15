@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	pbdb "github.com/markTward/grpc-demo/examples/db1/grpc/db"
-	rpb "github.com/markTward/grpc-demo/examples/db1/grpc/grpc_reflection_v1alpha"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
@@ -23,7 +22,7 @@ func Base(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "URL.Path = %q\n", r.URL.Path)
 }
 
-func ReflectService(w http.ResponseWriter, r *http.Request) {
+func ServiceInfo(w http.ResponseWriter, r *http.Request) {
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(addressDB, grpc.WithInsecure())
 	if err != nil {
@@ -31,27 +30,17 @@ func ReflectService(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close()
 
-	c := rpb.NewServerReflectionClient(conn)
-	stream, err := c.ServerReflectionInfo(context.Background())
+	c := pbdb.NewDBServiceClient(conn)
 
-	if err = stream.Send(&rpb.ServerReflectionRequest{
-		MessageRequest: &rpb.ServerReflectionRequest_ListServices{},
-	}); err != nil {
-		log.Fatalf("failed to send request: %v", err)
-	}
-	sri, err := stream.Recv()
-	if err != nil {
-		// io.EOF is not ok.
-		log.Fatalf("failed to recv response: %v", err)
-	}
+	// acquire/release worker via buffered tokens channel
+	tokens <- struct{}{}
+	rpc, err := c.ServiceInfo(context.Background(), &pbdb.ServiceInfoRequest{})
+	<-tokens
 
-	services := sri.GetListServicesResponse().Service
-	for _, service := range services {
-		fmt.Fprintf(w, "Name: %v\n", service.Name)
-		desc, _ := service.Descriptor()
-		fmt.Fprintf(w, "Descriptor: %v\n", desc)
-	}
+	fmt.Fprintf(w, "Service Descriptor: %T\t%v\n", rpc.Values, rpc.Values)
+
 }
+
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-type", "application/json")
