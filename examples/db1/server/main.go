@@ -87,41 +87,24 @@ func (s *server) Read(ctx context.Context, in *pb.ReadRequest) (*pb.ReadReply, e
 }
 
 func (s *server) ServiceInfo(ctx context.Context, in *pb.ServiceInfoRequest) (*pb.ServiceInfoReply, error) {
+
 	si, _ := in.Descriptor()
 	fd, _ := decodeFileDesc(si)
 
-	log.Println("Decoded:", fd)
+	var sims []*pb.ServiceInfoMethod
 
-	gs := fd.GetService()
-	log.Println("Service:", gs)
-
-	var md []string
 	for _, mt := range fd.GetMessageType() {
-		md = append(md, *mt.Name)
+		sim := &pb.ServiceInfoMethod{}
+		var fields []string
+		for _, field := range mt.Field {
+			fields = append(fields, field.GetName())
+		}
+		sim.Name = *mt.Name
+		sim.Fields = fields
+		sims = append(sims, sim)
 	}
-	log.Println("metadata:", md)
-	return &pb.ServiceInfoReply{Values: md}, nil
 
-	// si, _ := in.Descriptor()
-	// fd, _ := decodeFileDesc(si)
-	//
-	// var methods []*pb.ServiceInfoMethodDef
-	// var method pb.ServiceInfoMethodDef
-	//
-	// // methods := make([]pb.ServiceInfoMethodDef, 0)
-	//
-	// for _, mt := range fd.GetMessageType() {
-	// 	var fields []string
-	// 	for _, field := range mt.Field {
-	// 		fields = append(fields, field.GetName())
-	// 	}
-	// 	method.Name = *mt.Name
-	// 	method.Fields = fields
-	// 	methods = append(methods, method)
-	// }
-	//
-	// log.Println("methods:", methods)
-	// return &pb.ServiceInfoReply{Values: methods}, nil
+	return &pb.ServiceInfoReply{Methods: sims}, nil
 
 }
 
@@ -141,16 +124,15 @@ func decompress(b []byte) ([]byte, error) {
 
 func decodeFileDesc(enc []byte) (*dpb.FileDescriptorProto, error) {
 	raw, err := decompress(enc)
-	fmt.Println("Decompressed:", raw)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decompress enc: %v", err)
 	}
 
 	fd := new(dpb.FileDescriptorProto)
-
 	if err := proto.Unmarshal(raw, fd); err != nil {
 		return nil, fmt.Errorf("bad descriptor: %v", err)
 	}
+
 	return fd, nil
 }
 

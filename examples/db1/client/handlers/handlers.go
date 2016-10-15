@@ -37,7 +37,7 @@ func ServiceInfo(w http.ResponseWriter, r *http.Request) {
 	rpc, err := c.ServiceInfo(context.Background(), &pbdb.ServiceInfoRequest{})
 	<-tokens
 
-	fmt.Fprintf(w, "Service Descriptor: %T\t%v\n", rpc.Values, rpc.Values)
+	fmt.Fprintf(w, "Service Descriptor: %T\t%v\n", rpc.Methods, rpc.Methods)
 
 }
 
