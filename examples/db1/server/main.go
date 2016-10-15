@@ -81,8 +81,6 @@ func (s *server) Read(ctx context.Context, in *pb.ReadRequest) (*pb.ReadReply, e
 	}
 
 	log.Printf("Read: Keys: %v\t Values: %v\n", in.Keys, values)
-	desc, _ := in.Descriptor()
-	log.Printf("Descriptor: %v\n", desc)
 
 	// lookup key in db
 	return &pb.ReadReply{Values: values}, nil
@@ -153,8 +151,6 @@ func (s *server) Upsert(ctx context.Context, in *pb.UpsertRequest) (*pb.UpsertRe
 	// assign value to key in db
 	s.db[in.Key] = in.Value
 	log.Printf("Upsert: Key: %v\t Value: %v\n", in.Key, in.Value)
-	desc, _ := in.Descriptor()
-	log.Printf("Descriptor: %v\n", desc)
 
 	return &pb.UpsertReply{Value: s.db[in.Key]}, nil
 }
@@ -169,8 +165,7 @@ func main() {
 	s := grpc.NewServer()
 	pb.RegisterDBServiceServer(s, newDBServer())
 
-	// // debug output for service
-	// si := s.GetServiceInfo()
+	log.Print("attempt to start service")
 
 	// start server
 	s.Serve(lis)
