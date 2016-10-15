@@ -62,10 +62,10 @@ message UpsertReply {
   string value=1;
 }
 
-//message ServiceInfoMethodDef {
-//  string name=1;
-//  repeated string fields=2;
-// }
+message ServiceInfoMethodDef {
+  string name=1;
+  repeated string fields=2;
+ }
 
 message ServiceInfoRequest {}
 

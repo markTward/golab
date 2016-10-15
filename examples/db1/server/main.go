@@ -100,17 +100,29 @@ func (s *server) ServiceInfo(ctx context.Context, in *pb.ServiceInfoRequest) (*p
 		md = append(md, *mt.Name)
 	}
 	log.Println("metadata:", md)
-
-	// for _, mt := range fd.GetMessageType() {
-	// 	// fmt.Printf("message type: %T\t%v\n", mt, mt)
-	// 	fmt.Printf("Name:\t%v\n", *mt.Name)
-	// 	fmt.Println("Fields:")
-	// 	for _, f := range mt.Field {
-	// 		fmt.Printf("\t%v\n", f)
-	// 	}
-	// }
-
 	return &pb.ServiceInfoReply{Values: md}, nil
+
+	// si, _ := in.Descriptor()
+	// fd, _ := decodeFileDesc(si)
+	//
+	// var methods []*pb.ServiceInfoMethodDef
+	// var method pb.ServiceInfoMethodDef
+	//
+	// // methods := make([]pb.ServiceInfoMethodDef, 0)
+	//
+	// for _, mt := range fd.GetMessageType() {
+	// 	var fields []string
+	// 	for _, field := range mt.Field {
+	// 		fields = append(fields, field.GetName())
+	// 	}
+	// 	method.Name = *mt.Name
+	// 	method.Fields = fields
+	// 	methods = append(methods, method)
+	// }
+	//
+	// log.Println("methods:", methods)
+	// return &pb.ServiceInfoReply{Values: methods}, nil
+
 }
 
 // decompress does gzip decompression.
