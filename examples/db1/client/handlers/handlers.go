@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -37,8 +38,8 @@ func ServiceInfo(w http.ResponseWriter, r *http.Request) {
 	rpc, err := c.ServiceInfo(context.Background(), &pbdb.ServiceInfoRequest{})
 	<-tokens
 
-	fmt.Fprintf(w, "Service Descriptor: %T\t%v\n", rpc.Methods, rpc.Methods)
-
+	jsonMethods, _ := json.Marshal(rpc.Methods)
+	fmt.Fprintf(w, "%v", string(jsonMethods))
 }
 
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
