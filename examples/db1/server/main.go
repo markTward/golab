@@ -104,7 +104,7 @@ func (s *server) ServiceInfo(ctx context.Context, in *pb.ServiceInfoRequest) (*p
 		sims = append(sims, sim)
 	}
 
-	return &pb.ServiceInfoReply{Methods: sims}, nil
+	return &pb.ServiceInfoReply{Service: *fd.GetService()[0].Name, Methods: sims}, nil
 
 }
 
@@ -118,7 +118,6 @@ func decompress(b []byte) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("bad gzipped descriptor: %v\n", err)
 	}
-
 	return out, nil
 }
 

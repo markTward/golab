@@ -38,8 +38,14 @@ func ServiceInfo(w http.ResponseWriter, r *http.Request) {
 	rpc, err := c.ServiceInfo(context.Background(), &pbdb.ServiceInfoRequest{})
 	<-tokens
 
+	/*TODO: need to learn how to use "github.com/golang/protobuf/jsonpb" to marshal protobuf messages into json
+	https://godoc.org/github.com/golang/protobuf/jsonpb
+	rpc.GetMethods() provides pb list of methods.  why get from server? */
+
+	// hacky write out in JSON for service and methods
 	jsonMethods, _ := json.Marshal(rpc.Methods)
-	fmt.Fprintf(w, "%v", string(jsonMethods))
+	fmt.Fprintf(w, `{"%v":%v}`, rpc.Service, string(jsonMethods))
+
 }
 
 func HealthCheck(w http.ResponseWriter, r *http.Request) {

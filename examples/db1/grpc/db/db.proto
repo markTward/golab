@@ -70,5 +70,6 @@ message ServiceInfoMethod {
 }
 
 message ServiceInfoReply {
-  repeated ServiceInfoMethod methods  = 1;
+  string service=1;
+  repeated ServiceInfoMethod methods  = 2;
 }
