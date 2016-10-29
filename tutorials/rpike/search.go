@@ -6,12 +6,6 @@ import (
 	"time"
 )
 
-var (
-	Web1, Web2     = fakeSearch("web"), fakeSearch("web")
-	Image1, Image2 = fakeSearch("image"), fakeSearch("image")
-	Video1, Video2 = fakeSearch("video"), fakeSearch("video")
-)
-
 type Result string
 type Search func(query string) Result
 
@@ -33,6 +27,12 @@ func FI(query string, replicas ...Search) Result {
 
 func Google(query string) (results []Result) {
 	c := make(chan Result)
+
+	var (
+		Web1, Web2     = fakeSearch("web"), fakeSearch("web")
+		Image1, Image2 = fakeSearch("image"), fakeSearch("image")
+		Video1, Video2 = fakeSearch("video"), fakeSearch("video")
+	)
 
 	go func() { c <- FI(query, Web1, Web2) }()
 	go func() { c <- FI(query, Image1, Image2) }()
