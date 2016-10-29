@@ -86,6 +86,7 @@ func (s *server) Read(ctx context.Context, in *pb.ReadRequest) (*pb.ReadReply, e
 	return &pb.ReadReply{Values: values}, nil
 }
 
+//TODO: create package and locate in markTward tools
 func (s *server) ServiceInfo(ctx context.Context, in *pb.ServiceInfoRequest) (*pb.ServiceInfoReply, error) {
 
 	si, _ := in.Descriptor()
