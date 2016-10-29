@@ -1,0 +1,13 @@
+config:
+  jobqueue:
+    number: 1000
+  workerqueue:
+    number: 100
+  worker:
+    number: 100
+  statchan:
+    number: 100
+  jobs:
+    number: 0
+  testing:
+    duration: 15

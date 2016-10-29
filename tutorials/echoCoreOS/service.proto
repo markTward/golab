@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package echopb;
+
+import "google/api/annotations.proto";
+
+message EchoMessage {
+  string message = 1;
+}
+
+// The greeting service definition.
+service EchoService {
+  // Echo a string
+  rpc Echo (EchoMessage) returns (EchoMessage) {
+    option (google.api.http) = {
+    post: "/v1/echo"
+    body: "*"
+    };
+  }
+}
+
+
+/*
+generate pb for echo service
+
+protoc -I/usr/local/include -I. \
+ -I$GOPATH/src \
+ -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+ --go_out=google/api/annotations.proto=github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api,plugins=grpc:. \
+./service.proto
+ */
+
+/*
+generage pb for grpc gateway (how does it insert "gw" into autogen file?)
+
+protoc -I/usr/local/include -I. \
+-I$GOPATH/src \
+-I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+--grpc-gateway_out=logtostderr=true:. \
+./service.proto
+ */
