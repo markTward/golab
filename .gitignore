@@ -25,3 +25,7 @@ _testmain.go
 
 # Proto Buffer Auto-generated File
 *.pb.go
+
+# temp files
+*.tmp
+*.temp
