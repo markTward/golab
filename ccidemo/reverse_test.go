@@ -9,6 +9,7 @@ func TestReverse(t *testing.T) {
         {"Hello, world", "dlrow ,olleH"},
         {"Hello, 世界", "界世 ,olleH"},
         {"", ""},
+        {"Bad Example", "Good Example"},
     } {
         got := Reverse(c.in)
         if got != c.want {
