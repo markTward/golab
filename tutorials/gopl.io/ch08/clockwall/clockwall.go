@@ -8,19 +8,34 @@
 package main
 
 import (
-	"flag"
+	"fmt"
 	"io"
 	"log"
 	"net"
 	"os"
-	"strconv"
+	"strings"
 )
 
 func main() {
-	port := flag.Int("port", 8000, "clock port")
-	flag.Parse()
 
-	conn, err := net.Dial("tcp", "localhost:"+strconv.Itoa(*port))
+	fmt.Println(os.Args)
+	for _, arg := range os.Args[1:] {
+		s := strings.Split(arg, "=")
+		tz, port := s[0], s[1]
+
+		fmt.Printf("%s\t", tz)
+
+		go connServer(port)
+	}
+
+	for {
+
+	}
+}
+
+func connServer(port string) {
+	conn, err := net.Dial("tcp", "localhost:"+port)
+	fmt.Println(port, conn)
 	if err != nil {
 		log.Fatal(err)
 	}
