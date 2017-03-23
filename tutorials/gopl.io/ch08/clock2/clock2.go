@@ -8,14 +8,25 @@
 package main
 
 import (
+	"flag"
 	"io"
 	"log"
 	"net"
+	"os"
+	"strconv"
 	"time"
 )
 
 func main() {
-	listener, err := net.Listen("tcp", "localhost:8000")
+
+	// accept CLI argument for port and read envvar for TZ
+	tz := os.Getenv("TZ")
+	loc, _ := time.LoadLocation(tz)
+
+	port := flag.Int("port", 8000, "clock port")
+	flag.Parse()
+
+	listener, err := net.Listen("tcp", "localhost:"+strconv.Itoa(*port))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -25,14 +36,16 @@ func main() {
 			log.Print(err) // e.g., connection aborted
 			continue
 		}
-		go handleConn(conn) // handle one connection at a time
+		go handleConn(conn, loc) // handle one connection at a time
 	}
 }
 
-func handleConn(c net.Conn) {
+func handleConn(c net.Conn, loc *time.Location) {
 	defer c.Close()
 	for {
-		_, err := io.WriteString(c, time.Now().Format("15:04:05\n"))
+		_, err := io.WriteString(c, time.Now().In(loc).Format("15:04:05\n"))
+		//		_, err := io.WriteString(c, time.Now().Format("15:04:05\n"))
+
 		if err != nil {
 			return // e.g., client disconnected
 		}
