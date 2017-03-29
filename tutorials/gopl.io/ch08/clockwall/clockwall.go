@@ -28,16 +28,17 @@ func main() {
 		go connServer(port)
 	}
 
-	for {
+	select {}
 
-	}
 }
 
 func connServer(port string) {
 	conn, err := net.Dial("tcp", "localhost:"+port)
 	fmt.Println(port, conn)
 	if err != nil {
-		log.Fatal(err)
+		// log.Fatal(err)
+		log.Println("error:", err)
+		return
 	}
 	defer conn.Close()
 	mustCopy(os.Stdout, conn)
