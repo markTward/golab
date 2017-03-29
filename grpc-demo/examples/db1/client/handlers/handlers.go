@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	pbdb "github.com/markTward/grpc-demo/examples/db1/grpc/db"
+	pbdb "github.com/markTward/gospace/grpc-demo/examples/db1/grpc/db"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )

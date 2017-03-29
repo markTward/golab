@@ -48,7 +48,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
-	pb "github.com/markTward/grpc-demo/examples/db1/grpc/db"
+	pb "github.com/markTward/gospace/grpc-demo/examples/db1/grpc/db"
 )
 
 const (

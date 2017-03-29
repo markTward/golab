@@ -11,7 +11,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/markTward/grpc-demo/examples/db1/client/handlers"
+	"github.com/markTward/gospace/grpc-demo/examples/db1/client/handlers"
 )
 
 func main() {
