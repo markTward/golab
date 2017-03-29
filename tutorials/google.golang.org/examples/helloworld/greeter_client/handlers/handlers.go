@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	pb "github.com/markTward/gospace/tutorials/google.golang.org/examples/hello/helloworld"
+	pb "github.com/markTward/gospace/tutorials/google.golang.org/examples/helloworld/helloworld"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )

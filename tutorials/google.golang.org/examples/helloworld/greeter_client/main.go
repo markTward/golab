@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/markTward/gospace/tutorials/google.golang.org/examples/hello/greeter_client/handlers"
+	"github.com/markTward/gospace/tutorials/google.golang.org/examples/helloworld/greeter_client/handlers"
 )
 
 const (
