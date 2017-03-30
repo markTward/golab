@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	addressDB   = "localhost:8000"
+	addressDB   = "server:8000"
 	defaultName = "World!"
 )
 
