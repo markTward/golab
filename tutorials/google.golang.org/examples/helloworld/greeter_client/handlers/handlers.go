@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -48,6 +49,5 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("could not greet: %v", err)
 	}
 	log.Printf("Greeting: %s", rpc.Message)
-
-	w.Write([]byte(rpc.Message))
+	fmt.Fprint(w, rpc.Message)
 }
