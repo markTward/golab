@@ -1,0 +1,20 @@
+version: "3"
+
+# networks:
+#   grpc:
+
+services:
+  server:
+    image: grpchw:0.1
+    command: greeter_server
+    expose:
+      - 8000
+    # networks:
+    #   - grpc
+  client:
+    image: grpchw:0.1
+    ports:
+      - 8010:8010
+    command: greeter_client
+    # networks:
+    #   - grpc
