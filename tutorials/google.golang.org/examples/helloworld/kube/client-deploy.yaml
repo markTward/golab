@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: grpchw
+  name: client
 spec:
   replicas: 1
   template:
@@ -15,4 +15,5 @@ spec:
         image: marktward/grpchw:kube
         ports:
         - containerPort: 8010
+          name: client
         command: ["greeter_client"]
