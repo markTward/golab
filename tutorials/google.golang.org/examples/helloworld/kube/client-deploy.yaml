@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: grpchw
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+      - name: client
+        imagePullPolicy: Always
+        image: marktward/grpchw:kube
+        ports:
+        - containerPort: 8010
+        command: ["greeter_client"]

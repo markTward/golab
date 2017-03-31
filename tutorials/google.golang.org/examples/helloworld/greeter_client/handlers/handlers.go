@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -12,13 +13,22 @@ import (
 )
 
 const (
-	addressDB   = "server:8000"
+	addressDB   = ":8000"
 	defaultName = "World!"
 )
 
 var tokens = make(chan struct{}, 100)
 
-// Respond to HelloWorld request
+// HealthCheck simple
+func HealthCheck(w http.ResponseWriter, r *http.Request) {
+	log.Printf("healthcheck OK")
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-type", "application/json")
+	is_alive := `{"is_alive": "true"}`
+	io.WriteString(w, is_alive)
+}
+
+// HelloWorld grpc request
 func HelloWorld(w http.ResponseWriter, r *http.Request) {
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(addressDB, grpc.WithInsecure())
