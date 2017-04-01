@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: greeter-grpc
+spec:
+  selector:
+    app: greeter
+    tier: backend
+    component: grpc
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000

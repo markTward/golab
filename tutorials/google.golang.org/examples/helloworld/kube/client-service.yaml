@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: greeter-web
+spec:
+  selector:
+    app: greeter
+    tier: frontend
+    component: web
+  ports:
+    - protocol: "TCP"
+      port: 8010
+      targetPort: 8010

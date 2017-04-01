@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	addressDB   = "server:8000"
+	addressDB   = "greeter-grpc:8000"
 	defaultName = "World!"
 )
 
