@@ -13,8 +13,7 @@ import (
 )
 
 const (
-	//	addressDB   = "greeter-grpc:8000"
-	addressDB   = ":8000"
+	addressDB   = "greeter-grpc:8000"
 	defaultName = "World!"
 	timeout     = 3
 )
