@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -21,11 +20,9 @@ var tokens = make(chan struct{}, 100)
 
 // HealthCheck simple
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
-	log.Printf("healthcheck OK")
 	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-type", "application/json")
-	is_alive := `{"is_alive": "true"}`
-	io.WriteString(w, is_alive)
+	fmt.Fprint(w, "")
+	log.Println(r.URL.Path, http.StatusOK)
 }
 
 // HelloWorld grpc request
@@ -58,6 +55,6 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}
-	log.Printf("Greeting: %s", rpc.Message)
+	log.Printf("%s?%s; grpc Message:%s", r.URL.Path, r.URL.RawQuery, rpc.Message)
 	fmt.Fprint(w, rpc.Message)
 }
