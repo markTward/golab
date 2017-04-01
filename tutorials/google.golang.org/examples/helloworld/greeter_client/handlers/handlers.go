@@ -44,17 +44,14 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 	// Greeter Client
 	c := pb.NewGreeterClient(conn)
 
-	// query string
-	q := r.URL.Query()
-
-	qname, ok := q["name"]
-	var name string
+	// handle 0-to-Many names
+	name := defaultName
+	qname, ok := r.URL.Query()["name"]
 	if ok {
 		name = strings.Join(qname, ", ")
-	} else {
-		name = defaultName
 	}
 
+	// grpc attempt
 	rpc, err := c.SayHello(context.Background(), &pb.HelloRequest{Name: name})
 	if err != nil {
 		log.Printf("%v", err)
