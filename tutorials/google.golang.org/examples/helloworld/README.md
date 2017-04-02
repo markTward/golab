@@ -24,7 +24,7 @@ TBD
 ## testing
 curl -i localhost:**PORT** ==> 404  
 curl -i localhost:**PORT**/healthcheck ==> 200  
-curl -i localhost:**PORT**/hw ==> Hello World! / 200
+curl -i localhost:**PORT**/hw ==> Hello World! / 200  
 curl -i localhost:**PORT**/hw?name=DUDE ==> Hello DUDE! / 200  
 
 #NOTES
