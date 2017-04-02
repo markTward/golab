@@ -16,7 +16,7 @@ kubectl get svc
 
 NAME           CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE  
 greeter-grpc   10.0.0.223   <none>        8000/TCP         3m  
-greeter-web    10.0.0.58    <nodes>       8010:**PORT**/TCP   6m  
+greeter-web    10.0.0.58    <nodes>       8010:PORT/TCP   6m  
 
 # gke
 TBD
