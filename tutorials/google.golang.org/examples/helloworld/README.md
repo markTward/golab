@@ -22,10 +22,10 @@ greeter-web    10.0.0.58    <nodes>       8010:**PORT**/TCP   6m
 TBD
 
 ## testing
-curl -i localhost:<PORT>/ ==> 404  
-curl -i localhost:<PORT>/healthcheck ==> 200  
-curl -i localhost:<PORT>/hw ==> Hello World! / 200
-curl -i localhost:<PORT>/hw?name=DUDE ==> Hello DUDE! / 200  
+curl -i localhost:**PORT** ==> 404  
+curl -i localhost:**PORT**/healthcheck ==> 200  
+curl -i localhost:**PORT**/hw ==> Hello World! / 200
+curl -i localhost:**PORT**/hw?name=DUDE ==> Hello DUDE! / 200  
 
 #NOTES
 
