@@ -15,7 +15,7 @@ import (
 const (
 	addressDB   = "greeter-grpc:8000"
 	defaultName = "World!"
-	timeout     = 3
+	timeout     = 1
 )
 
 var tokens = make(chan struct{}, 100)

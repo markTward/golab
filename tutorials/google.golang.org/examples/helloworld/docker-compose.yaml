@@ -1,20 +1,15 @@
 version: "3"
 
-# networks:
-#   grpc:
-
 services:
-  server:
-    image: grpchw:0.1
+  # greeter-grpc is used as network alias and must match addressDB value in pkg handlers
+  greeter-grpc:
+    image: marktward/grpchw:kube
     command: greeter_server
     expose:
       - 8000
-    # networks:
-    #   - grpc
+
   client:
-    image: grpchw:0.1
+    image: marktward/grpchw:kube
     ports:
       - 8010:8010
     command: greeter_client
-    # networks:
-    #   - grpc
