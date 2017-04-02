@@ -1,19 +1,19 @@
-#Create/inspect docker network for inter-service communication
-docker network ls
-docker network create --driver bridge grpc
-docker network ls
-docker network inspect grpc
-
-#Startup containers
-docker run -d --expose 8000 --network grpc --name server grpchw:0.1 greeter_server
-docker run -p 8010:8010 -d --network grpc --name client grpchw:0.1 greeter_client
-docker network inspect grpc
+#docker
+docker-compose up -d
 
 #Test grpc client
-curl 0.0.0.0:8010/hw?name=mtw ==> Hello mtw
-curl 0.0.0.0:8010/hw ==> Hello World!
-curl 0.0.0.0:8010/ ==> 404
+curl -i localhost:8010/ ==> 404
+curl -i localhost:8010/healthcheck ==> 200
+curl -i localhost:8010/hw ==> Hello World! / 200
+curl -i localhost:8010/hw? ==> Hello World! / 200
+curl -i localhost:8010/hw?name= ==> Hello World! / 200
+curl -i localhost:8010/hw?name=DUDE
+
+#cleanup
+docker-compose stop
+docker-compose rm -f
 
 #NOTES
-Both greeter_client and greeter_server binaries installed in image grpchw
-Web client reaches server using grpc.Dial("server:8010") to accommodate docker service discovery in grpc network where container name must match hostname.  Use ENVVAR to make portable between localhost, docker and k8s?
+
+#TODO
+Mock testing for grpc and http

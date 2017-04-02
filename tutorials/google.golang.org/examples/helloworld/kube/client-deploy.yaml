@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: greeter-web
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: greeter
+        tier: frontend
+        component: web
+    spec:
+      containers:
+      - name: greeter-fe
+        imagePullPolicy: Always
+        image: marktward/grpchw:kube
+        ports:
+        - containerPort: 8010
+          name: greeter-fe
+        command: ["greeter_client"]
