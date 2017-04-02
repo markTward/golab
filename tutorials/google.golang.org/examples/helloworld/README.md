@@ -24,7 +24,7 @@ curl -i localhost:**PORT**/healthcheck ==> 200
 curl -i localhost:**PORT**/hw ==> Hello World! / 200  
 curl -i localhost:**PORT**/hw?name=DUDE ==> Hello DUDE! / 200  
 
-# cleanup
+## cleanup
 kubectl delete deploy/greeter-grpc deploy/greeter-web  
 kubectl delete svc/greeter-grpc svc/greeter-web  
 minikube stop
